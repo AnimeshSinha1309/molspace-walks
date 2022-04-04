@@ -6,3 +6,7 @@ It will provide whatever data interface we have to get the molecules,
 their neighbors on the graph, the graph based representation of said molecules
 in PyTorch and RDKit, and more.
 """
+
+import molspace.dataspace.gdbloader
+import molspace.dataspace.generate
+import molspace.dataspace.featurizers

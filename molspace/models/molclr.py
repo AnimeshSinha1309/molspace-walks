@@ -18,11 +18,16 @@ class GraphEncoder(torch.nn.Module):
         """
         super(GraphEncoder, self).__init__()
         self.conv_input = torch_geometric.nn.GraphConv(input_dim, 20)
-        self.conv_internal = torch.nn.ModuleList([
-            torch_geometric.nn.GraphConv(20, 20) for _ in range(num_conv_layers)])
+        self.conv_internal = torch.nn.ModuleList(
+            [torch_geometric.nn.GraphConv(20, 20) for _ in range(num_conv_layers)]
+        )
         self.conv_output = torch_geometric.nn.GraphConv(20, output_size)
         self.linear_output = torch.nn.ModuleList(
-            [torch.nn.Linear(output_size, output_size) for _ in range(num_linear_layers)])
+            [
+                torch.nn.Linear(output_size, output_size)
+                for _ in range(num_linear_layers)
+            ]
+        )
 
     def forward(self, graph: torch.Tensor, n_feat: torch.Tensor):
         """
@@ -52,14 +57,16 @@ class MoleculeComparator(torch.nn.Module):
         """
         Create the 2 molecule comparator network using the same featurizer network
         as a base.
-        Note that self.feat is a neural network which featurizes and can be used in isolation.
+        Note that `self.feat` is a neural network which featurizes and can be used in isolation.
         :param input_dim: size of the input features
         :param output_dim: latent space vector dimensionality
         :param num_conv_layers: number of graph convolutional layers
         :param num_linear_layers: number of linear layers in the prediction head
         """
         super(MoleculeComparator, self).__init__()
-        self.feat = GraphEncoder(input_dim, output_dim, num_conv_layers, num_linear_layers)
+        self.feat = GraphEncoder(
+            input_dim, output_dim, num_conv_layers, num_linear_layers
+        )
         self.linear_1 = torch.nn.Linear(2 * output_dim, 10)
         self.linear_2 = torch.nn.Linear(10, 10)
         self.linear_3 = torch.nn.Linear(10, 1)

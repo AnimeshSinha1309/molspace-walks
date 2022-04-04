@@ -12,13 +12,25 @@ from rdkit.Chem.Draw import MolsToGridImage
 
 class GDBMoleculesDataset(torch_geometric.data.InMemoryDataset):
 
-    _url = 'https://zenodo.org/record/5172018/files/gdb11.tgz?download=1'
+    _url = "https://zenodo.org/record/5172018/files/gdb11.tgz?download=1"
     _molecules_per_file = 200_000
 
     def __init__(self, root: str, name: str, min_size: int = 1, max_size: int = 11):
         self.name = name
         self._size_range_in_atoms = (min_size, max_size)
-        self._num_atoms_per_file = [4, 9, 20, 80, 352, 1850, 10568, 66706, 444313, 3114041, 22796628]
+        self._num_atoms_per_file = [
+            4,
+            9,
+            20,
+            80,
+            352,
+            1850,
+            10568,
+            66706,
+            444313,
+            3114041,
+            22796628,
+        ]
         super().__init__(root)
         self.data, self.slices = torch.load(self.processed_paths[0])
 
@@ -32,38 +44,67 @@ class GDBMoleculesDataset(torch_geometric.data.InMemoryDataset):
 
     @property
     def raw_file_names(self) -> typing.List[str]:
-        return [f'gdb11_size{i:02}.smi' for i in range(self._size_range_in_atoms[0], self._size_range_in_atoms[1] + 1)]
+        return [
+            f"gdb11_size{i:02}.smi"
+            for i in range(
+                self._size_range_in_atoms[0], self._size_range_in_atoms[1] + 1
+            )
+        ]
 
     @property
     def processed_file_names(self) -> typing.List[str]:
-        total_atoms = sum(self._num_atoms_per_file[self._size_range_in_atoms[0] - 1: self._size_range_in_atoms[1]])
-        number_of_files = (total_atoms + self._molecules_per_file - 1) // self._molecules_per_file
-        return [f'data_{i}.pt' for i in range(1, number_of_files + 1)]
+        total_atoms = sum(
+            self._num_atoms_per_file[
+                self._size_range_in_atoms[0] - 1 : self._size_range_in_atoms[1]
+            ]
+        )
+        number_of_files = (
+            total_atoms + self._molecules_per_file - 1
+        ) // self._molecules_per_file
+        return [f"data_{i}.pt" for i in range(1, number_of_files + 1)]
 
     def download(self):
         torch_geometric.data.download_url(self._url, self.raw_dir)
-        os.system(f"tar -xvf {os.path.join(self.raw_dir, 'gdb11.tgz')} -C {self.raw_dir}")
+        os.system(
+            f"tar -xvf {os.path.join(self.raw_dir, 'gdb11.tgz')} -C {self.raw_dir}"
+        )
 
     def process(self):
         molecules: typing.List[torch_geometric.data.Data] = []
         file_number = 1
-        total_atoms = sum(self._num_atoms_per_file[self._size_range_in_atoms[0] - 1: self._size_range_in_atoms[1]])
+        total_atoms = sum(
+            self._num_atoms_per_file[
+                self._size_range_in_atoms[0] - 1 : self._size_range_in_atoms[1]
+            ]
+        )
         progress_bar = tqdm.tqdm(total=total_atoms)
-        for size in range(self._size_range_in_atoms[0], self._size_range_in_atoms[1] + 1):
+        for size in range(
+            self._size_range_in_atoms[0], self._size_range_in_atoms[1] + 1
+        ):
             with open(os.path.join(self.raw_dir, "gdb11_size%02d.smi" % size)) as f:
                 for line in f.readlines():
                     progress_bar.update(1)
-                    molecules.append(self.featurize_molecule(rdkit.Chem.MolFromSmiles(line.split()[0])))
+                    molecules.append(
+                        self.featurize_molecule(
+                            rdkit.Chem.MolFromSmiles(line.split()[0])
+                        )
+                    )
                     if len(molecules) >= self._molecules_per_file:
-                        torch.save(self.collate(molecules), os.path.join(self.processed_dir, f"data_{file_number}.pt"))
+                        torch.save(
+                            self.collate(molecules),
+                            os.path.join(self.processed_dir, f"data_{file_number}.pt"),
+                        )
                         file_number += 1
                         molecules = []
         if len(molecules) > 0:
-            torch.save(self.collate(molecules), os.path.join(self.processed_dir, f"data_{file_number}.pt"))
+            torch.save(
+                self.collate(molecules),
+                os.path.join(self.processed_dir, f"data_{file_number}.pt"),
+            )
         progress_bar.close()
 
     def __repr__(self) -> str:
-        return f'{self.name}()'
+        return f"{self.name}()"
 
     @property
     def node_features_shape(self):
@@ -82,7 +123,9 @@ class GDBMoleculesDataset(torch_geometric.data.InMemoryDataset):
         :param atom: atom object in an rdkit molecule
         :return: np.array, the feature vector for the atom
         """
-        possible_atom_labels = np.array(['C', 'N', 'O', 'S', 'F', 'P', 'Cl', 'Br', 'I', 'Si'])
+        possible_atom_labels = np.array(
+            ["C", "N", "O", "S", "F", "P", "Cl", "Br", "I", "Si"]
+        )
         atom_label = atom.GetSymbol() == possible_atom_labels
 
         feature_vector = np.concatenate([atom_label]).astype(np.float)
@@ -95,8 +138,14 @@ class GDBMoleculesDataset(torch_geometric.data.InMemoryDataset):
         :param bond: bond object in an rdkit molecule
         :return: np.array, the feature vector for the atom
         """
-        possible_bond_types = np.array([rdkit.Chem.rdchem.BondType.SINGLE, rdkit.Chem.rdchem.BondType.DOUBLE,
-                                        rdkit.Chem.rdchem.BondType.TRIPLE, rdkit.Chem.rdchem.BondType.AROMATIC])
+        possible_bond_types = np.array(
+            [
+                rdkit.Chem.rdchem.BondType.SINGLE,
+                rdkit.Chem.rdchem.BondType.DOUBLE,
+                rdkit.Chem.rdchem.BondType.TRIPLE,
+                rdkit.Chem.rdchem.BondType.AROMATIC,
+            ]
+        )
         bond_type = bond.GetBondType() == possible_bond_types
 
         feature_vector = np.concatenate([bond_type]).astype(np.float)
@@ -132,12 +181,14 @@ class GDBMoleculesDataset(torch_geometric.data.InMemoryDataset):
         return torch_geometric.data.Data(
             x=torch.from_numpy(np.stack(node_features)).float(),
             edge_index=torch.from_numpy(np.stack(edge_list, axis=1)).long(),
-            edge_attr=torch.from_numpy(np.stack(edge_features)).float()
+            edge_attr=torch.from_numpy(np.stack(edge_features)).float(),
         )
 
     @staticmethod
     def draw_molecule(graph_edge_list, node_features, _bond_features):
-        possible_atom_labels = np.array(['C', 'N', 'O', 'S', 'F', 'P', 'Cl', 'Br', 'I', 'Si'])
+        possible_atom_labels = np.array(
+            ["C", "N", "O", "S", "F", "P", "Cl", "Br", "I", "Si"]
+        )
         molecule = rdkit.Chem.RWMol()
         # TODO: Complete this RWMol problem
         pass

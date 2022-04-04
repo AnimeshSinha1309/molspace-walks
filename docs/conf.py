@@ -45,6 +45,7 @@ autodoc_mock_imports = [
     'sklearn',
     'plotly',
     'pandas',
+    'torch',
 ]
 
 # Add any paths that contain templates here, relative to this directory.

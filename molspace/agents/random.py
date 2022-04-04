@@ -2,8 +2,6 @@
 
 import numpy as np
 
-from ..dataset.meta_dataset import MetaDataset
-
 
 class RandomAgent:
     """A random agent for evaluating the combination of moves"""
@@ -11,7 +9,7 @@ class RandomAgent:
     def __init__(
         self,
         num_actions: int,
-        evaluator: MetaDataset,
+        evaluator,
     ) -> None:
         """Initialize a new random searcher object.
         This initializes an agent which will randomly try out different
@@ -29,7 +27,7 @@ class RandomAgent:
         :param n_trials: Number of iterations of random samples to run
         """
         for _ in range(n_trials):
-            state = np.random.randint(2 ** self.num_actions)
+            state = np.random.randint(2**self.num_actions)
             reward = self.evaluator(state)
             if reward > self.best_reward:
                 self.best_reward = reward

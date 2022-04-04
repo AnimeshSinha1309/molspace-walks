@@ -7,3 +7,6 @@ The module should plug into an environment interfacing with it's action-step
 interface and attempt to maximally explore relevant parts of said environment
 with minimum number of search calls.
 """
+
+import molspace.agents.random
+import molspace.agents.mcts
