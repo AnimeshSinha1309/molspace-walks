@@ -92,23 +92,38 @@ class GDBMoleculesDataset(torch_geometric.data.InMemoryDataset):
         :rtype: List[str]
         :return: List of file names which house torch_geometric graph data
         """
-        total_atoms = sum(
+        total_molecules = sum(
             self._num_atoms_per_file[
                 (self._size_range_in_atoms[0] - 1):(self._size_range_in_atoms[1])
             ]
         )
         number_of_files = (
-            total_atoms + self._molecules_per_file - 1
+            total_molecules + self._molecules_per_file - 1
         ) // self._molecules_per_file
         return [f"data_{i}.pt" for i in range(1, number_of_files + 1)]
 
-    def download(self):
+    def __len__(self):
+        """
+        Gives the total number of molecules in the dataset
+        WARNING: If you have changed the number of atoms in the constructor,
+        but not deleted the processed files, this information will be wrong and
+        carried forward from the older processing step.
+        :return:
+        """
+        total_molecules = sum(
+            self._num_atoms_per_file[
+                (self._size_range_in_atoms[0] - 1):(self._size_range_in_atoms[1])
+            ]
+        )
+        return total_molecules
+
+    def download(self) -> None:
         torch_geometric.data.download_url(self._url, self.raw_dir)
         os.system(
             f"tar -xvf {os.path.join(self.raw_dir, 'gdb11.tgz')} -C {self.raw_dir}"
         )
 
-    def process(self):
+    def process(self) -> None:
         molecules: typing.List[torch_geometric.data.Data] = []
         file_number = 1
         total_atoms = sum(
@@ -146,17 +161,17 @@ class GDBMoleculesDataset(torch_geometric.data.InMemoryDataset):
         return f"{self.name}()"
 
     @property
-    def node_features_shape(self):
+    def node_features_shape(self) -> typing.Tuple[int]:
         mol = rdkit.Chem.MolFromSmiles("C")
         return self.featurize_atom(mol.GetAtomWithIdx(0)).shape
 
     @property
-    def edge_features_shape(self):
+    def edge_features_shape(self) -> typing.Tuple[int]:
         mol = rdkit.Chem.MolFromSmiles("CC")
         return self.featurize_atom(mol.GetBondBetweenAtoms(0, 1)).shape
 
     @staticmethod
-    def featurize_atom(atom):
+    def featurize_atom(atom: rdkit.Chem.Atom) -> np.ndarray:
         """
         Generates a Feature Vector for the given atom
         :param atom: atom object in a rdkit molecule
@@ -171,7 +186,7 @@ class GDBMoleculesDataset(torch_geometric.data.InMemoryDataset):
         return feature_vector
 
     @staticmethod
-    def featurize_bond(bond):
+    def featurize_bond(bond: rdkit.Chem.Bond) -> np.ndarray:
         """
         Generates a Feature Vector for the given bond
         :param bond: bond object in a rdkit molecule
@@ -224,7 +239,7 @@ class GDBMoleculesDataset(torch_geometric.data.InMemoryDataset):
         )
 
     @classmethod
-    def draw_molecule(cls, molecule):
+    def draw_molecule(cls, molecule: torch_geometric.data.Data):
         """
         Generates a RDKit molecule object from the PyTorch Graph
         :type molecule: pyg.data.Data
@@ -238,7 +253,7 @@ class GDBMoleculesDataset(torch_geometric.data.InMemoryDataset):
         return image
 
     @staticmethod
-    def get_rdkit(molecule: torch_geometric.data.Data):
+    def get_rdkit(molecule: torch_geometric.data.Data) -> rdkit.Chem.Mol:
         """
         Generates a RDKit molecule object from the PyTorch Graph
         :type molecule: pyg.data.Data
@@ -277,4 +292,7 @@ if __name__ == "__main__":
     print(data[idx].x)
     print(data[idx].edge_index)
     print(data[idx].edge_attr)
+    molecule = GDBMoleculesDataset.get_rdkit(data[idx])
+    smiles = rdkit.Chem.MolToSmiles(molecule)
+    print(smiles)
     GDBMoleculesDataset.draw_molecule(data[idx]).show()
