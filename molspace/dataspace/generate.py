@@ -16,7 +16,7 @@ from molspace.dataspace.featurizers import molecule_similarity
 
 class MolecularSpace:
 
-    def __init__(self, data: GDBMoleculesDataset, threshold: int = 0.0):
+    def __init__(self, data: GDBMoleculesDataset, threshold: int = 0.3):
         self.graph = nx.Graph()
         self.data = data
 
@@ -25,6 +25,8 @@ class MolecularSpace:
 
         for idx in tqdm.trange(len(data) * len(data)):
             i, j = idx // len(data), idx % len(data)
+            if i == j:
+                continue
             mol_i = data.get_rdkit(data[i])
             mol_j = data.get_rdkit(data[j])
             similarity = molecule_similarity(mol_i, mol_j)
@@ -35,7 +37,10 @@ class MolecularSpace:
         return list(self.graph.neighbors(node))
 
     def step(self, state, action):
-        return self.graph.neighbors(state)[action]
+        return list(self.graph.neighbors(state))[action]
+
+    def __len__(self):
+        return len(self.data)
 
     def __str__(self):
         return str(self.graph)
