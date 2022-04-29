@@ -16,7 +16,7 @@ from molspace.dataspace.featurizers import molecule_similarity
 
 class MolecularSpace:
 
-    def __init__(self, data: GDBMoleculesDataset, threshold: int = 0.3):
+    def __init__(self, data: GDBMoleculesDataset, threshold: int = 0.7):
         self.graph = nx.Graph()
         self.data = data
 
