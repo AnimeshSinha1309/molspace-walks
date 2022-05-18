@@ -11,7 +11,7 @@ import networkx as nx
 import tqdm.auto as tqdm
 
 from molspace.dataspace.gdbloader import GDBMoleculesDataset
-from molspace.dataspace.featurizers import molecule_similarity
+from molspace.dataspace.similarity import molecule_similarity
 
 
 class MolecularSpace:

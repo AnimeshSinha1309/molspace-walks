@@ -5,10 +5,10 @@ import GraphRicciCurvature.OllivierRicci
 
 import plotly.express as px
 
-import molspace
+from molspace.environment.tanimoto import MolecularSpace
 
 
-def curvature_histogram(graph: molspace.dataspace.generate.MolecularSpace) -> None:
+def curvature_histogram(graph: MolecularSpace) -> None:
     curvature_finder = GraphRicciCurvature.OllivierRicci.OllivierRicci(graph.graph)
     curvature_computation_start_time = time.time()
     curvature_finder.compute_ricci_curvature()

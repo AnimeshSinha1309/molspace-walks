@@ -6,9 +6,7 @@ import molspace
 rdkit.RDLogger.logger().setLevel(rdkit.RDLogger.CRITICAL)
 
 gdb = molspace.dataspace.gdbloader.GDBMoleculesDataset("data", "gdb11", min_size=3, max_size=4)
-graph = molspace.dataspace.generate.MolecularSpace(gdb)
-
-# molspace.visualizers.curvature_vis.curvature_histogram(graph)
+graph = molspace.environment.tanimoto.MolecularSpace(gdb)
 
 best_property = -999999999999.
 best_molecule = None
@@ -36,7 +34,7 @@ for i in range(10):
             probabilities = np.array(action_values)
             probabilities = np.exp(probabilities / 10)
             probabilities = probabilities / np.sum(probabilities)
-            best_action = np.random.choice(np.arange(len(probabilities)), p=probabilities)
+            best_action = np.random.choice(np.arange(len(probabilities)))
             state = graph.step(state, best_action)
         else:
             state = np.random.randint(len(graph))

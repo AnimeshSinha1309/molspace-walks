@@ -6,3 +6,4 @@ import molspace.engine
 import molspace.agents
 import molspace.visualizers
 import molspace.predictors
+import molspace.environment

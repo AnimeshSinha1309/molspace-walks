@@ -8,5 +8,5 @@ in PyTorch and RDKit, and more.
 """
 
 import molspace.dataspace.gdbloader
-import molspace.dataspace.generate
+import environment.tanimoto
 import molspace.dataspace.featurizers
