@@ -5,8 +5,9 @@ import molspace
 
 rdkit.RDLogger.logger().setLevel(rdkit.RDLogger.CRITICAL)
 
-gdb = molspace.dataspace.gdbloader.GDBMoleculesDataset("data", "gdb11", min_size=3, max_size=4)
+gdb = molspace.dataspace.gdbloader.GDBMoleculesDataset("data", "gdb11", min_size=3, max_size=6)
 graph = molspace.environment.tanimoto.MolecularSpace(gdb)
+molspace.visualizers.curvature_vis.curvature_histogram(graph)
 
 best_property = -999999999999.
 best_molecule = None

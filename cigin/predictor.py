@@ -23,4 +23,4 @@ class CIGINPredictor:
         )
         interaction_map = interaction_map.cpu().detach().numpy()
         delta_g = delta_g.cpu().detach().item()
-        return interaction_map, delta_g
+        return delta_g

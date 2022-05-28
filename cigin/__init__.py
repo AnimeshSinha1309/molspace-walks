@@ -3,3 +3,4 @@ import cigin.model
 import cigin.featurize
 import cigin.utils
 import cigin.train
+import cigin.predictor

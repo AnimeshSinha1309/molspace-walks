@@ -20,8 +20,8 @@ warnings.filterwarnings("ignore")
 def main(interaction, max_epochs):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    train_loader = csv_to_loader('data/train.csv', batch_size=32, shuffle=True)
-    valid_loader = csv_to_loader('data/valid.csv', batch_size=128)
+    train_loader = csv_to_loader('solvatum/data/train.csv', batch_size=32, shuffle=True)
+    valid_loader = csv_to_loader('solvatum/data/valid.csv', batch_size=128)
 
     model = CIGINModel(interaction=interaction)
     model.to(device)
