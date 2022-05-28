@@ -7,3 +7,4 @@ import molspace.agents
 import molspace.visualizers
 import molspace.predictors
 import molspace.environment
+import molspace.memory

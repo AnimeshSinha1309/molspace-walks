@@ -23,15 +23,15 @@ class MoleculeComparator(torch.nn.Module):
         self.feat = GraphEncoder(
             input_dim, output_dim, num_conv_layers, num_linear_layers
         )
-        self.linear_1 = torch.nn.Linear(2 * output_dim, 10)
+        self.linear_1 = torch.nn.Linear(3 * output_dim, 10)
         self.linear_2 = torch.nn.Linear(10, 10)
         self.linear_3 = torch.nn.Linear(10, 1)
 
-    def forward(self, mol_1_graph, mol_1_nodes, mol_2_graph, mol_2_nodes):
+    def forward(self, mol_1_graph, mol_1_nodes, _mol_1_edges, mol_2_graph, mol_2_nodes, _mol_2_edges):
         molecule_1 = self.feat(mol_1_graph, mol_1_nodes)
         molecule_2 = self.feat(mol_2_graph, mol_2_nodes)
 
-        result = torch.cat([molecule_1, molecule_2], dim=-1)
+        result = torch.cat([molecule_1, molecule_2, torch.mul(molecule_1, molecule_2)], dim=-1)
         result = torch.relu(self.linear_1(result))
         result = torch.relu(self.linear_2(result))
         result = torch.sigmoid(self.linear_3(result))

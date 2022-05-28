@@ -10,3 +10,5 @@ with minimum number of search calls.
 
 import molspace.agents.random
 import molspace.agents.mcts
+import molspace.agents.molwalker
+import molspace.agents.lipschitz

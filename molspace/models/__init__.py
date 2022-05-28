@@ -8,4 +8,4 @@ visualization.
 """
 
 import molspace.models.molclr
-import molspace.models.cigin
+import molspace.models.valnet

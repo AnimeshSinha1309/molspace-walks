@@ -50,7 +50,7 @@ class GatherModel(torch.nn.Module):
         return out + init
 
 
-class CIGINModel(torch.nn.Module):
+class MultiplicativeConvModel(torch.nn.Module):
     """
     This the main class for CIGIN model
     """
@@ -65,7 +65,7 @@ class CIGINModel(torch.nn.Module):
                  num_step_set2_set=2,
                  num_layer_set2set=1,
                  ):
-        super(CIGINModel, self).__init__()
+        super(MultiplicativeConvModel, self).__init__()
 
         self.node_input_dim = node_input_dim
         self.node_hidden_dim = node_hidden_dim
